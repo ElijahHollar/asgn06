@@ -1,21 +1,31 @@
 <?php
 
 include("function-library.php");
+include_once("functions/utility-functions.php");
 
-$nameList = "short-list-names.txt";
+$fullNames = get_full_names("names.txt");
+ 
+$validNames = validate_names($fullNames);
 
-$fullName = get_full_names($nameList);
-$lastName = get_last_names($fullName);
-$firstName = get_first_names($fullName);
-
-// for($count = 0; $count < count($fullName); $count++) {
-//   print("<p>$fullName[$count]</p>");
+// for($i = 0; $i < count($validNames); $i++) {
+//     print("<p>$validNames[$i]</p>");
 // }
 
-$uniqueFullNames = count(array_unique($fullName));
-$uniqueLastNames = count(array_unique($lastName));
-$uniqueFirstNames = count(array_unique($firstName));
 
-print("<p>Number of unique names: $uniqueFullNames</p>");
-print("<p>Number of unique last names: $uniqueLastNames</p>");
-print("<p>Number of unique first names: $uniqueFirstNames</p>");
+$firstNames = get_first_names($validNames);
+
+$lastNames = get_last_names($validNames);
+
+// print("<p>Most common first names:</p>");
+
+// find_common_names($firstNames);
+
+// print("<p>Most common last names:</p>");
+
+// find_common_names($lastNames);
+
+// find_special_unique_names($firstNames, $lastNames, 25);
+
+// print("<h1>Temp Seperator</h1>");
+
+modify_unique_names($firstNames, $lastNames, 25);
