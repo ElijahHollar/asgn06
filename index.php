@@ -38,5 +38,6 @@
       print("<h2>Modified Names</h2>");
       modify_unique_names($firstNames, $lastNames, 25);
     ?>
+    <p><a href="..">Return to WEB 182 main page</a></p>
   </body>
 </html>
