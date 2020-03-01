@@ -33,8 +33,8 @@ function validate_names($array) {
 }
 
 function count_unique_names($array) {
-    $uniqueNames = count(array_unique($array));
-    return $uniqueNames;
+    $numUniqueNames = count(array_unique($array));
+    return $numUniqueNames;
 }
 
 function get_first_names ($array) {
@@ -59,20 +59,21 @@ function find_common_names ($array) {
   $values = array_count_values($array);
   arsort($values);
   $commonNames = array_slice(array_keys($values), 0, 10, true);
-    
+
   for($i = 0; $i <= 9; $i++) {
-    print("<p>$commonNames[$i]</p>");
+    $valueKey = $commonNames[$i];
+    print("<p>$commonNames[$i] - appears $values[$valueKey] times</p>");
   }
 }
 
-function find_special_unique_names($firstNameArray, $lastNameArray, $numberOfValuesToReturn) {
+function find_special_unique_names($firstNameArray, $lastNameArray, $numOfValues) {
   $uniqueFirst = array_unique($firstNameArray);
   $uniqueLast = array_unique($lastNameArray);
   $nameNum = 1;
 
-  for($i = 0; $i < $numberOfValuesToReturn; $i++) {
+  for($i = 0; $i < $numOfValues; $i++) {
     if( empty($uniqueFirst[$i]) or empty($uniqueLast[$i]) ) {
-      $numberOfValuesToReturn++;
+      $numOfValues++;
     }
     else {
       print("<p>$nameNum. $uniqueLast[$i], $uniqueFirst[$i]</p>");
@@ -81,47 +82,77 @@ function find_special_unique_names($firstNameArray, $lastNameArray, $numberOfVal
   }
 }
 
-function modify_unique_names($firstNameArray, $lastNameArray, $numberOfValuesToReturn) {
-
-  // get arrays to create names from
-  $uniqueFirst = array_values(array_unique($firstNameArray));
-  $uniqueLast = array_values(array_unique($lastNameArray));
-
-  // create validation array
-  $checkLastNames = $uniqueLast;
-
-  // shuffle last name array
-  shuffle($uniqueLast);
-
-  // establish name numbering variable
-  $nameNum = 1;
-
-  for($i = 0; $i < $numberOfValuesToReturn; $i++) {
-
-    // check to make sure that shuffled last name is in different spot (i.e. make sure that name #18 didnt get put back into key 18 after being shuffled)
-    if ($uniqueLast[$i] == $checkLastNames[$i]) {
-      // if validation fails print nothing and increase the names to be printed by 1, so that the number of values requested are still outputted
-      $numberOfValuesToReturn++;
+function modify_unique_names($firstNameArray, $lastNameArray, $numOfValues) {
+  
+  // get starting arrays
+  $uniqueFirst = array_unique($firstNameArray);
+  $uniqueLast = array_unique($lastNameArray);
+  
+  // get number of last-first name pairs to grab
+  $numLastNames = $numOfValues;
+  
+  // extract the required number of last-first name pairs
+  for($i = 0; $i < $numLastNames; $i++) {
+    
+    // skip any pairs where there are any empty values
+    if( empty($uniqueFirst[$i]) ) {
+      $numLastNames++;
+    }
+    elseif( empty($uniqueLast[$i]) ) {
+      $numLastNames++;
     }
 
-    // if validation passes print the name and increment the name numbering variable by 1
+    // create name generation and validation arrays
     else {
-      print("<p>$nameNum. $uniqueLast[$i], $uniqueFirst[$i]</p>");
-      $nameNum++;
+      $useableFirst[] = $uniqueFirst[$i];
+      $shuffleLast[] = $uniqueLast[$i];
+      $checkLastNames[] = $uniqueLast[$i];
     }
   }
   
-  // $i = 0;
-  // $n = $i + 1;
+  // shuffle the last name array
+  shuffle($shuffleLast);
+  
+  // declare misc variables
+  $nameNum = 1;
+  $usedNames = [];
+  $a = 0;
+  $subtract = 0;
 
-  // for($i = 0; $i < $numberOfValuesToReturn; $i++) {
-  //   if($i == $numberOfValuesToReturn - 1) {
-  //     $n = 0;
-  //     print("<p>$uniqueFirst[$i] $uniqueLast[$n]");
-  //   }
-  //   else {
-  //       print("<p>$uniqueFirst[$i] $uniqueLast[$n]");
-  //       $n = $n + 1;
-  //   }
-  // }
+  for($i = 0; $i < $numOfValues; $i++) {
+
+    // validation (make sure the shuffle actually shuffled things)
+    if($shuffleLast[$i] == $checkLastNames[$a]) {
+
+      // subtract the number of names to return based on the number of names already generated
+      $numOfValues = $numOfValues - $subtract;
+      $subtract = 0;
+
+      // reset $i (after this if statement process $i will increment and be back to 0)
+      $i = 0 - 1;
+      
+      // remove last names that have already been used, compact the array, and reshuffle the array
+      $shuffleLast = array_diff($shuffleLast, $usedNames);
+      $shuffleLast = array_values($shuffleLast);
+      shuffle($shuffleLast);
+    }
+    else {
+      
+      // print the genearted name
+      print("<p>$nameNum. $shuffleLast[$i], $useableFirst[$a]</p>");
+
+      // increment numbering variable
+      $nameNum++;
+
+      // add last name to list of used names
+      $usedNames[] = $shuffleLast[$i];
+
+      // increment first name and validation array counter
+      $a++;
+
+      // increment subtraction variable
+      $subtract++;
+    }
+  }
+  exit();
 }
