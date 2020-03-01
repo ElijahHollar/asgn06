@@ -154,5 +154,4 @@ function modify_unique_names($firstNameArray, $lastNameArray, $numOfValues) {
       $subtract++;
     }
   }
-  exit();
 }
